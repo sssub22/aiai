@@ -1,11 +1,17 @@
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = process.env.API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+// Helper to get the AI instance lazily. 
+// This ensures we pick up the API_KEY from process.env *after* the user has selected it in the UI.
+const getAi = () => {
+  const apiKey = process.env.API_KEY || '';
+  return new GoogleGenAI({ apiKey });
+};
 
 export const generateEncouragement = async (minutes: number, task: string): Promise<string> => {
-  if (!apiKey) return "오늘도 수고했어요! 정말 멋진 집중력이었습니다.";
-
+  const ai = getAi();
+  // We can check if apiKey is actually present, but the library will throw/fail gracefully if empty.
+  // The App.tsx flow ensures we try to get a key before calling this.
+  
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
@@ -20,7 +26,7 @@ export const generateEncouragement = async (minutes: number, task: string): Prom
 };
 
 export const generateActivityEncouragement = async (activity: string): Promise<string> => {
-  if (!apiKey) return "좋은 습관을 실천했네요! 정말 멋져요.";
+  const ai = getAi();
 
   try {
     const response = await ai.models.generateContent({
@@ -36,7 +42,7 @@ export const generateActivityEncouragement = async (activity: string): Promise<s
 };
 
 export const generatePetName = async (petType: string): Promise<string> => {
-  if (!apiKey) return "신비한 친구";
+  const ai = getAi();
 
   try {
     const response = await ai.models.generateContent({

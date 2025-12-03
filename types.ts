@@ -1,10 +1,12 @@
-export enum PetStage {
-  EGG = 1,
-  CRACKED_EGG = 2,
-  BABY = 3,
-  YOUNG = 4,
-  ADULT = 5,
-}
+export const PetStage = {
+  EGG: 1,
+  CRACKED_EGG: 2,
+  BABY: 3,
+  YOUNG: 4,
+  ADULT: 5,
+} as const;
+
+export type PetStage = typeof PetStage[keyof typeof PetStage];
 
 export interface Pet {
   id: string;

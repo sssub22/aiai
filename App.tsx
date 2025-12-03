@@ -5,7 +5,7 @@ import {
   XP_PER_LEVEL, MAX_PET_LEVEL, DAILY_ACTIVITY_LIMIT, ACTIVITY_XP_REWARD, STUDY_XP_REWARD_CHUNK 
 } from './types';
 import { generateEncouragement, generateActivityEncouragement, generatePetName } from './services/gemini';
-import { Home, Timer, BookOpen, Scroll, Play, Square, CheckCircle, Activity, Star, User as UserIcon, Trash2 } from 'lucide-react';
+import { Home, Timer, BookOpen, Scroll, Play, Square, CheckCircle, Activity, Star, User as UserIcon, Trash2, KeyRound } from 'lucide-react';
 
 // Utility to get today's date string
 const getTodayDate = () => new Date().toISOString().split('T')[0];
@@ -28,8 +28,46 @@ const INITIAL_PET: Pet = {
   birthDate: getTodayDate(),
 };
 
+// --- Landing / Auth Component ---
+const LandingPage = ({ onConnect }: { onConnect: () => void }) => {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 to-orange-50 p-6 text-center space-y-8">
+      <div className="animate-bounce-in">
+        <div className="w-32 h-32 bg-white rounded-full shadow-xl flex items-center justify-center mx-auto mb-6 border-4 border-indigo-100">
+           <span className="text-6xl">🦉</span>
+        </div>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">나와 펫의 <span className="text-indigo-600">성장일기</span></h1>
+        <p className="text-gray-500 text-sm max-w-xs mx-auto">
+          공부 습관을 기르고 나만의 펫을 키워보세요.<br/>
+          함께 성장하는 즐거움이 기다리고 있습니다.
+        </p>
+      </div>
+
+      <div className="w-full max-w-xs space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+        <button 
+          onClick={onConnect}
+          className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold shadow-lg shadow-indigo-200 transform transition active:scale-95 flex items-center justify-center space-x-2"
+        >
+          <KeyRound className="w-5 h-5" />
+          <span>API Key로 시작하기</span>
+        </button>
+        
+        <p className="text-[10px] text-gray-400">
+          * 원활한 펫 생성과 격려 메시지를 위해 Gemini API Key가 필요합니다.<br/>
+          <a href="https://ai.google.dev/gemini-api/docs/billing" target="_blank" rel="noreferrer" className="underline hover:text-indigo-500">
+            API Key 발급 및 과금 정책 확인하기
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+};
+
 export default function App() {
-  // --- State ---
+  // --- Auth State ---
+  const [hasApiKey, setHasApiKey] = useState(false);
+
+  // --- App State ---
   const [activeTab, setActiveTab] = useState<'home' | 'timer' | 'records' | 'collection'>('home');
   
   // Data State
@@ -50,6 +88,22 @@ export default function App() {
   const [encouragement, setEncouragement] = useState<string | null>(null);
 
   // --- Effects ---
+
+  // Check for API Key on Mount
+  useEffect(() => {
+    const checkKey = async () => {
+      // @ts-ignore - window.aistudio is injected by the environment
+      if (window.aistudio && window.aistudio.hasSelectedApiKey) {
+        // @ts-ignore
+        const has = await window.aistudio.hasSelectedApiKey();
+        if (has) setHasApiKey(true);
+      } else if (process.env.API_KEY) {
+        // Fallback if environment already has it injected
+        setHasApiKey(true);
+      }
+    };
+    checkKey();
+  }, []);
 
   // Load data on mount
   useEffect(() => {
@@ -83,6 +137,22 @@ export default function App() {
 
   // --- Logic Helpers ---
 
+  const handleKeyConnect = async () => {
+    // @ts-ignore
+    if (window.aistudio && window.aistudio.openSelectKey) {
+      try {
+        // @ts-ignore
+        await window.aistudio.openSelectKey();
+        // Assuming success if the dialog closes and promise resolves
+        setHasApiKey(true);
+      } catch (e) {
+        console.error("Key selection failed", e);
+      }
+    } else {
+      alert("API Key selection is not supported in this environment.");
+    }
+  };
+
   const addXP = async (amount: number, source: string) => {
     // 1. Update User
     const newUserLevel = Math.floor((user.totalXP + amount) / 500) + 1;
@@ -110,7 +180,7 @@ export default function App() {
         completePet(newPet);
         return; // Exit as pet is reset
       } else {
-        newPet.stage = potentialStage;
+        newPet.stage = potentialStage as PetStage;
         newPet.currentXP = remainingXP;
         leveledUp = true;
       }
@@ -459,6 +529,11 @@ export default function App() {
         </div>
     </div>
   );
+
+  // If we don't have an API key yet, show the landing page
+  if (!hasApiKey) {
+    return <LandingPage onConnect={handleKeyConnect} />;
+  }
 
   return (
     <div className="min-h-screen max-w-md mx-auto bg-[#F9FAFB] flex flex-col relative overflow-hidden shadow-2xl">
