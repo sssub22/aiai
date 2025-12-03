@@ -1,6 +1,6 @@
 import React from 'react';
 import { PetStage } from '../types';
-import { Egg, Bird, Sparkles, User, Trophy, ShieldCheck, Star, BookOpen } from 'lucide-react';
+import { Egg } from 'lucide-react';
 
 interface PetVisualProps {
   stage: PetStage;
@@ -8,7 +8,7 @@ interface PetVisualProps {
   className?: string;
 }
 
-export const PetVisual: React.FC<PetVisualProps> = ({ stage, type, className = "" }) => {
+export const PetVisual: React.FC<PetVisualProps> = ({ stage, className = "" }) => {
   const getSize = () => {
     switch (stage) {
       case PetStage.EGG: return "w-24 h-24";

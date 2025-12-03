@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PetVisual, XPBar } from './components/Visuals';
 import { 
   Pet, User, ActivityRecord, PetStage, DailyTracking, 
   XP_PER_LEVEL, MAX_PET_LEVEL, DAILY_ACTIVITY_LIMIT, ACTIVITY_XP_REWARD, STUDY_XP_REWARD_CHUNK 
 } from './types';
 import { generateEncouragement, generateActivityEncouragement, generatePetName } from './services/gemini';
-import { Home, Timer, BookOpen, Scroll, Play, Square, CheckCircle, Activity, Star, User as UserIcon, Trash2, KeyRound } from 'lucide-react';
+import { Home, Timer, BookOpen, Scroll, Play, Square, CheckCircle, Activity, Star, User as UserIcon, Trash2 } from 'lucide-react';
 
 // Utility to get today's date string
 const getTodayDate = () => new Date().toISOString().split('T')[0];
