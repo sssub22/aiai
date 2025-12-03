@@ -21,20 +21,21 @@ const PET_NAMES = [
   "마루", "사랑이", "토리", "호두", "두부"
 ];
 
-export const generateEncouragement = async (minutes: number, task: string): Promise<string> => {
+// Parameters are prefixed with underscore to satisfy TypeScript's noUnusedParameters rule
+export const generateEncouragement = async (_minutes: number, _task: string): Promise<string> => {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 500));
   const randomIndex = Math.floor(Math.random() * STUDY_MESSAGES.length);
   return STUDY_MESSAGES[randomIndex];
 };
 
-export const generateActivityEncouragement = async (activity: string): Promise<string> => {
+export const generateActivityEncouragement = async (_activity: string): Promise<string> => {
   await new Promise(resolve => setTimeout(resolve, 500));
   const randomIndex = Math.floor(Math.random() * ACTIVITY_MESSAGES.length);
   return ACTIVITY_MESSAGES[randomIndex];
 };
 
-export const generatePetName = async (petType: string): Promise<string> => {
+export const generatePetName = async (_petType: string): Promise<string> => {
   await new Promise(resolve => setTimeout(resolve, 500));
   const randomIndex = Math.floor(Math.random() * PET_NAMES.length);
   return PET_NAMES[randomIndex];
